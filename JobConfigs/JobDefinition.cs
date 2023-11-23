@@ -16,9 +16,12 @@ namespace AzureSftpBlobSync.JobConfigs
             this.SaveInJournalBeforeDeleteFromBlobStoragePath = string.Empty;
             this.BlobFolderRecursiveEnabled = false; 
             this.BlobSftpFolderRecursiveEnabled = false;
+
         } 
 
         public string Name { get; set; }
+        public int SftpAccountId { get; set; }
+        public int BlobAccountId { get; set; }
         public string SftpFolder { get; set; }
         public string BlobFolder { get; set; }
         public JobType JobType { get; set; }

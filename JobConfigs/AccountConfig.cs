@@ -16,7 +16,7 @@ namespace AzureSftpBlobSync.JobConfigs
             this.PrivateKey = string.Empty;
             this.PrivateKeyPassPhrase = string.Empty;
         }
-
+        public int Id { get; set; }
         public string Url { get; set; }
 
         public int Port { get; set; }
