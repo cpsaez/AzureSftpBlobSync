@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AzureSftpBlobSync.JobConfigs
 {
-    public class AccountConfig
+    public class SftpAccountConfig
     {
-        public AccountConfig() { 
+        public SftpAccountConfig() { 
             this.Url = string.Empty;
             this.Port = 0;
             this.UserName = string.Empty;
@@ -27,5 +28,10 @@ namespace AzureSftpBlobSync.JobConfigs
         public string PrivateKey { get; set; }
 
         public string PrivateKeyPassPhrase { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id} : {Url} : {Port} ";
+        }
     }
 }

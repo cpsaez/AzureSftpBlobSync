@@ -15,7 +15,7 @@ namespace AzureSftpBlobSync.JobConfigs
             this.JobType = JobType.None;
             this.SaveInJournalBeforeDeleteFromBlobStoragePath = string.Empty;
             this.BlobFolderRecursiveEnabled = false; 
-            this.BlobSftpFolderRecursiveEnabled = false;
+            this.SftpFolderRecursiveEnabled = false;
 
         } 
 
@@ -29,6 +29,6 @@ namespace AzureSftpBlobSync.JobConfigs
 
         public bool BlobFolderRecursiveEnabled { get; set; }
 
-        public bool BlobSftpFolderRecursiveEnabled { get; set; }
+        public bool SftpFolderRecursiveEnabled { get; set; }
     }
 }
