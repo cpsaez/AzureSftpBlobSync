@@ -35,24 +35,46 @@ namespace AzureSftpBlobSync.Engine
 
             if (jobType == JobType.MoveFromSftpToBlobStorage || jobType == JobType.CopyFromSftpToBlobStorage)
             {
-                FromSftpToBlobStorage(sftp, blob);
+                await FromSftpToBlobStorage(sftp, blob);
             }
             else if (jobType == JobType.MoveFromBlobStorageToSftp || jobType == JobType.CopyFromBlobStorageToSftp)
             {
-
+                await FromBlobStorageToSftp(sftp, blob);
             }
         }
 
-        private void FromSftpToBlobStorage(SftpWrapper sftp, AzureBlobWrapper blob)
+        private async Task FromSftpToBlobStorage(SftpWrapper sftp, AzureBlobWrapper blob)
         {
             var filesToCopy = sftp.Dir(this.jobDefinition.SftpFolder, this.jobDefinition.SftpFolderRecursiveEnabled);
             foreach (var file in filesToCopy)
             {
-
+                var destination = PathHelper.CalculateDestiny(this.jobDefinition.SftpFolder, this.jobDefinition.BlobFolder, file);
                 using (var reader = sftp.OpenReadStream(file))
                 {
-                    
+                    await blob.WriteBlob(destination, reader);
+                }
 
+                if (this.jobDefinition.JobType==JobType.MoveFromSftpToBlobStorage)
+                {
+                    sftp.DeleteFile(file);
+                }
+            }
+        }
+
+        private async Task FromBlobStorageToSftp(SftpWrapper sftp, AzureBlobWrapper blob)
+        {
+            var filesToCopy = await blob.Dir(this.jobDefinition.BlobFolder, this.jobDefinition.BlobFolderRecursiveEnabled);
+            foreach (var file in filesToCopy)
+            {
+                var destination = PathHelper.CalculateDestiny(this.jobDefinition.BlobFolder, this.jobDefinition.SftpFolder, file);
+                using (var reader = await blob.GetStreamReader(file))
+                {
+                    sftp.WriteStream(reader, destination);
+                }
+
+                if (this.jobDefinition.JobType == JobType.MoveFromSftpToBlobStorage)
+                {
+                    sftp.DeleteFile(file);
                 }
             }
         }

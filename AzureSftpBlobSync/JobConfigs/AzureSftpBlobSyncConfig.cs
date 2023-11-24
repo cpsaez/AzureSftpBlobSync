@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AzureSftpBlobSync.JobConfigs
@@ -30,7 +31,9 @@ namespace AzureSftpBlobSync.JobConfigs
         {
             try
             {
-                var result = JsonSerializer.Deserialize<IEnumerable<T>>(this.SftpAccounts);
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new JsonStringEnumConverter());
+                var result = JsonSerializer.Deserialize<IEnumerable<T>>(variable, options);
                 if (result == null) { return Enumerable.Empty<T>(); }
                 return result;
             }

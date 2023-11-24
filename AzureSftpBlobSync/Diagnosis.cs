@@ -32,7 +32,17 @@ namespace AzureSftpBlobSync
                 foreach (var sftpConfig in config.BuildSftpAccounts())
                 {
                     response.WriteString(sftpConfig.ToString() + Environment.NewLine);
+                    try
+                    {
+                        SftpWrapper wrapper = new SftpWrapper(sftpConfig);
+                        wrapper.Connect();
+                    }
+                    catch (Exception ex)
+                    {
+                        response.WriteString($"Failed to connect {ex.Message}"  + Environment.NewLine);
+                    }
                 }
+
                 response.WriteString("Blob config:" + Environment.NewLine);
                 response.WriteString("------------" + Environment.NewLine);
                 foreach (var blobConfig in config.BuildBlobAccounts())

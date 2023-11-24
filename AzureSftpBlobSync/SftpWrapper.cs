@@ -3,12 +3,13 @@ using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AzureSftpBlobSync
 {
-    public class SftpWrapper
+    public class SftpWrapper : IDisposable
     {
         private SftpClient client;
 
@@ -20,6 +21,11 @@ namespace AzureSftpBlobSync
         public IEnumerable<string> Dir(string sftpFolder, bool sftpFolderRecursiveEnabled)
         {
             this.Connect();
+            if (!this.client.Exists(sftpFolder))
+            {
+                return Enumerable.Empty<string>();
+            }
+
             var listDirectory=this.client.ListDirectory(sftpFolder);
             if (listDirectory == null) return Array.Empty<string>();
             List<string> result = new List<string>();
@@ -44,15 +50,40 @@ namespace AzureSftpBlobSync
             return stream;
         }
 
+        public void WriteStream(Stream reader, string destination)
+        {
+            Connect();
+            this.client.UploadFile(reader, destination);
+        }
+
+        public void WriteBytes(byte[] bytes, string destination)
+        {
+            Connect();
+            this.client.WriteAllBytes(destination, bytes);
+        }
+
         public void DeleteFile(string file)
         {
             this.Connect();
             this.client.Delete(file);
         }
 
-        private void Connect()
+        public void Connect()
         {
             if (!this.client.IsConnected) this.client.Connect();
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                if (this.client!=null && this.client.IsConnected)
+                {
+                    this.client.Disconnect();
+                    this.client.Dispose();
+                }
+            }
+            catch { }
         }
 
         private SftpClient BuildSftpClient(SftpAccountConfig sftpConfig)
@@ -76,5 +107,7 @@ namespace AzureSftpBlobSync
             SftpClient client = new SftpClient(connectionInfo);
             return client;
         }
+
+
     }
 }

@@ -1,10 +1,12 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using AzureSftpBlobSync.JobConfigs;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,13 +91,44 @@ namespace AzureSftpBlobSync
             await blockBlobClientoFrom.DeleteAsync();
         }
 
-        public async Task<IEnumerable<string>> Dir(string folder)
+        public async Task<IEnumerable<string>> Dir(string folder, bool recursive)
         {
-            var blobs = blobContainerClient.GetBlobsAsync(BlobTraits.None, BlobStates.None, folder);
-            List<string> result = new List<string>();
-            await foreach (var blob in blobs)
+            if (folder.StartsWith(@"/"))
             {
-                result.Add(blob.Name);
+                folder = folder.Substring(1, folder.Length - 1);
+            }
+            if (!folder.EndsWith(@"/"))
+            {
+                folder = folder + "/";
+            }
+
+            List<string> result = new List<string>();
+            //return result;
+            // Call the listing operation and return pages of the specified size.
+            var resultSegment = blobContainerClient.GetBlobsByHierarchyAsync(prefix: folder, delimiter: "/")
+                .AsPages(default, 50);
+
+            // Enumerate the blobs returned for each page.
+            await foreach (Page<BlobHierarchyItem> blobPage in resultSegment)
+            {
+                // A hierarchical listing may return both virtual directories and blobs.
+                foreach (BlobHierarchyItem blobhierarchyItem in blobPage.Values)
+                {
+                    if (blobhierarchyItem.IsPrefix && recursive)
+                    {
+                        // Write out the prefix of the virtual directory.
+                        Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
+
+                        // Call recursively with the prefix to traverse the virtual directory.
+                        var resultRecursive=await Dir(blobhierarchyItem.Prefix, true);
+                        result.AddRange(resultRecursive); ;
+                    }
+                    else
+                    {
+                        // Write out the name of the blob.
+                        result.Add(blobhierarchyItem.Blob.Name);
+                    }
+                }
             }
 
             return result;
@@ -105,18 +138,6 @@ namespace AzureSftpBlobSync
         {
             var blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
             await blockBlobClient.DeleteIfExistsAsync();
-        }
-
-        public IEnumerable<string> GetSubDirs(string folder)
-        {
-            var directories = blobContainerClient.GetBlobsByHierarchy(BlobTraits.None, BlobStates.None, "/", folder).Where(b => b.IsPrefix).ToList();
-            List<string> result = new List<string>();
-            foreach (var blob in directories)
-            {
-                result.Add(blob.Prefix);
-            }
-
-            return result;
         }
 
         public bool Exists(string file)

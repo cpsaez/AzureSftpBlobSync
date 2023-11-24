@@ -1,4 +1,5 @@
 using System;
+using AzureSftpBlobSync.Engine;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -6,18 +7,26 @@ namespace AzureSftpBlobSync
 {
     public class Scheduler
     {
-        private readonly ILogger _logger;
+        private readonly ILogger logger;
+        private readonly IJobsExecutor executor;
 
-        public Scheduler(ILoggerFactory loggerFactory)
+        public Scheduler(ILoggerFactory loggerFactory, IJobsExecutor executor)
         {
-            _logger = loggerFactory.CreateLogger<Scheduler>();
+            this.logger = loggerFactory.CreateLogger<Scheduler>();
+            this.executor = executor;
         }
 
         [Function("Scheduler")]
-        public void Run([TimerTrigger("0 * * * * *")] SchedulerInfo myTimer)
+        public async Task Run([TimerTrigger("0 * * * * *")] SchedulerInfo myTimer)
         {
-            _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            _logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
+            try
+            {
+                await executor.Execute();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, ex.Message);
+            }
         }
     }
 
