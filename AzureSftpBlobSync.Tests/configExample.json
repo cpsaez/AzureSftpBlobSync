@@ -1,0 +1,33 @@
+{
+  "SftpAccounts": [
+    {
+      "Id": 1,
+      "Url": "ip",
+      "Port": 8888,
+      "UserName": "username",
+      "Password": "password",
+      "PrivateKeyFileName": "/config/privatekey.txt",
+      "PrivateKeyPassPhrase": "passphrase"
+    }
+  ],
+  "BlobAccounts": [
+    {
+      "ConnectionString": "yourconnectionstring",
+      "ContainerName": "containername",
+      "Id": 3
+    }
+  ],
+  "JobDefinitions": [
+    {
+      "Name": "your job definition name",
+      "SftpAccountId": 1,
+      "BlobAccountId": 1,
+      "SftpFolder": "/yoursftpFolder/here",
+      "BlobFolder": "/yourblobFolder/here",
+      "JobType": "CopyFromSftpToBlobStorage",
+      "SaveInJournalBeforeDeleteFromBlobStoragePath": "/YourJournalPath/here/{yyyy}/{MM}/{dd}/{hh}/{mm}/{ss}",
+      "BlobFolderRecursiveEnabled": true,
+      "SftpFolderRecursiveEnabled": true
+    }
+  ]
+}

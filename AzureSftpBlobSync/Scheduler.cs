@@ -26,6 +26,7 @@ namespace AzureSftpBlobSync
             catch (Exception ex)
             {
                 this.logger.LogError(ex, ex.Message);
+                throw;
             }
         }
     }

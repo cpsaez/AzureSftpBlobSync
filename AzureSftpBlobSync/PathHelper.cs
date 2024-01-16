@@ -19,29 +19,56 @@ namespace AzureSftpBlobSync
              */
             originSearchPath=PutBeginEndSlash(originSearchPath);
             destinyPath=PutBeginEndSlash(destinyPath);
+            fullFileName=PutBeginSlash(fullFileName);
 
             var relative = Path.GetRelativePath(originSearchPath, fullFileName);
+            relative = RemoveBeginSlash(relative);
             var result = Path.Combine(destinyPath, relative);
             return ReplaceSlashs(result);
 
         }
 
-        private static string ReplaceSlashs(string path)
+        public static string ReplaceSlashs(string path)
         {
             return path.Replace(@"\", @"/");
         }
 
-        private static string PutBeginEndSlash(string path)
+        public static string RemoveBeginSlash(string path)
         {
             var result = ReplaceSlashs(path);
-            if (!result.StartsWith(@"/")) {
+            if (result.StartsWith(@"/"))
+            {
+                result = result.Substring(1, result.Length - 1);
+            }
+
+            return result;
+        }
+
+        public static string PutBeginSlash(string path)
+        {
+            var result = ReplaceSlashs(path);
+            if (!result.StartsWith(@"/"))
+            {
                 result = "/" + path;
             }
+
+            return result;
+        }
+
+        public static string PutEndSlash(string path)
+        {
+            var result = ReplaceSlashs(path);
             if (!result.EndsWith("/"))
             {
                 result = result + "/";
             }
             return result;
+        }
+
+        public static string PutBeginEndSlash(string path)
+        {
+            var result = PutBeginSlash(path);
+            return PutEndSlash(result);
         }
     }
 }

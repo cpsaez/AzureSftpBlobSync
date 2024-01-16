@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AzureSftpBlobSync.Engine;
+using AzureSftpBlobSync;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -13,12 +14,12 @@ var host = new HostBuilder()
                 config.AddJsonFile("local.settings.json");
             }
         })
-    .ConfigureServices(s => SetupConfigurationHelper.Configure(s))
     .ConfigureServices(services =>
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<IJobsExecutor, JobsExecutor>();
+        services.AddSingleton<IConfigBuilder, ConfigBuilder>();
     })
     .Build();
 

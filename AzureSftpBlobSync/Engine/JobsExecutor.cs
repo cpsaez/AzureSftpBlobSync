@@ -12,26 +12,28 @@ namespace AzureSftpBlobSync.Engine
 {
     public class JobsExecutor : IJobsExecutor
     {
-        private AzureSftpBlobSyncConfig config;
+        private IConfigBuilder config;
         private ILogger<JobsExecutor> logs;
 
-        public JobsExecutor(IOptions<AzureSftpBlobSyncConfig> config, ILogger<JobsExecutor> logs)
+        public JobsExecutor(IConfigBuilder config, ILogger<JobsExecutor> logs)
         {
-            this.config = config.Value;
+            this.config = config;
             this.logs = logs;
         }
 
         public async Task Execute()
         {
-            var jobs = this.config.BuildJobDefinitions();
-            var blobsAccounts=this.config.BuildBlobAccounts();
-            var sftpAccounts=this.config.BuildSftpAccounts(); 
+            var jsonConfig=await this.config.BuildConfig();
+            var jobs = jsonConfig.JobDefinitions;
+            var blobsAccounts=jsonConfig.BlobAccounts;
+            var sftpAccounts=jsonConfig.SftpAccounts;
+            var pgpKeys=jsonConfig.PgpKeys;
 
             foreach (var job in jobs)
             {
                 try
                 {
-                    var executor = new JobExecutor(job, blobsAccounts, sftpAccounts);
+                    var executor = new JobExecutor(job, blobsAccounts, sftpAccounts, pgpKeys, logs);
                     await executor.Execute();
                 }
                 catch (Exception ex)

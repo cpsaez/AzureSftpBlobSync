@@ -2,7 +2,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using AzureSftpBlobSync.JobConfigs;
+using AzureSftpBlobSync.JobConfigs.StorageAccounts;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -11,17 +11,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureSftpBlobSync
+namespace AzureSftpBlobSync.Providers.AzureBlobProvider
 {
-    public class AzureBlobWrapper 
+    public class AzureBlobWrapper : IProviderStreamer
     {
         private BlobServiceClient blobServiceClient;
         private BlobContainerClient blobContainerClient;
 
-        public AzureBlobWrapper(BlobConfig config)
+        public AzureBlobWrapper(Config config)
         {
-            this.blobServiceClient = new BlobServiceClient(config.ConnectionString);
-            this.blobContainerClient = blobServiceClient.GetBlobContainerClient(config.ContainerName);
+            blobServiceClient = new BlobServiceClient(config.ConnectionString);
+            blobContainerClient = blobServiceClient.GetBlobContainerClient(config.ContainerName);
         }
 
         /// <summary>
@@ -57,6 +57,9 @@ namespace AzureSftpBlobSync
 
         public async Task<byte[]?> ReadBlob(string blobName)
         {
+            // blob doesnt have a standard with the beggining "/"
+            blobName = PathHelper.RemoveBeginSlash(blobName);
+
             var blockBlobClient = blobContainerClient.GetBlockBlobClient(blobName);
             if (!await blockBlobClient.ExistsAsync())
             {
@@ -120,7 +123,7 @@ namespace AzureSftpBlobSync
                         Console.WriteLine("Virtual directory prefix: {0}", blobhierarchyItem.Prefix);
 
                         // Call recursively with the prefix to traverse the virtual directory.
-                        var resultRecursive=await Dir(blobhierarchyItem.Prefix, true);
+                        var resultRecursive = await Dir(blobhierarchyItem.Prefix, true);
                         result.AddRange(resultRecursive); ;
                     }
                     else
@@ -154,7 +157,10 @@ namespace AzureSftpBlobSync
 
         public async Task<Stream> GetStreamReader(string file)
         {
-            if (!this.Exists(file))
+            // blob doesnt have a standard with the beggining "/"
+            file = PathHelper.RemoveBeginSlash(file);
+
+            if (!Exists(file))
             {
                 throw new ArgumentNullException($"File {file} doesnt exist");
             }

@@ -1,4 +1,4 @@
-﻿using AzureSftpBlobSync.JobConfigs;
+﻿using AzureSftpBlobSync.JobConfigs.StorageAccounts;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace AzureSftpBlobSync
             if (listDirectory == null) return Array.Empty<string>();
             List<string> result = new List<string>();
             foreach (var entry in listDirectory) { 
-                if (entry.IsDirectory && sftpFolderRecursiveEnabled)
+                if (entry.IsDirectory && sftpFolderRecursiveEnabled && entry.Name!="." && entry.Name!="..")
                 {
                     result.AddRange(Dir(entry.FullName, true));
                 }   

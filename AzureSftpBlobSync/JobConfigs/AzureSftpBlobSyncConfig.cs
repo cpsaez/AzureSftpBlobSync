@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using AzureSftpBlobSync.JobConfigs.StorageAccounts;
+using AzureSftpBlobSync.Providers.AzureBlobProvider;
 
 namespace AzureSftpBlobSync.JobConfigs
 {
@@ -12,35 +14,16 @@ namespace AzureSftpBlobSync.JobConfigs
     {
         public AzureSftpBlobSyncConfig()
         {
-            this.SftpAccounts = string.Empty;
-            this.BlobAccounts = string.Empty;
-            this.Jobs = string.Empty;
+            PgpKeys = Array.Empty<PgpKey>();
+            SftpAccounts = Array.Empty<SftpAccountConfig>();
+            BlobAccounts = Array.Empty<Config>();
+            JobDefinitions = Array.Empty<JobDefinition>();
         }
 
-        public string SftpAccounts { get; set; }
-
-        public string BlobAccounts { get; set; }
-
-        public string Jobs { get; set; }
-
-        public IEnumerable<SftpAccountConfig> BuildSftpAccounts()=> this.Parse<SftpAccountConfig>(this.SftpAccounts);
-        public IEnumerable<BlobConfig> BuildBlobAccounts()=>this.Parse<BlobConfig>(this.BlobAccounts);
-        public IEnumerable<JobDefinition> BuildJobDefinitions() => this.Parse<JobDefinition>(this.Jobs);
-       
-        private IEnumerable<T> Parse<T>(string variable)
-        {
-            try
-            {
-                var options = new JsonSerializerOptions();
-                options.Converters.Add(new JsonStringEnumConverter());
-                var result = JsonSerializer.Deserialize<IEnumerable<T>>(variable, options);
-                if (result == null) { return Enumerable.Empty<T>(); }
-                return result;
-            }
-            catch
-            {
-                return Enumerable.Empty<T>();
-            }
-        }
+        public IEnumerable<SftpAccountConfig> SftpAccounts { get; set; }
+        public IEnumerable<PgpKey> PgpKeys { get; set; }
+        public IEnumerable<Config> BlobAccounts { get; set; }
+        public IEnumerable<JobDefinition> JobDefinitions { get; set; }
     }
 }
+
