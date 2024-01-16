@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureSftpBlobSync.Providers.AzureBlobProvider
+namespace AzureSftpBlobSync.Providers.StorageProviders.AzureBlobProvider
 {
     public class AzureBlobWrapper : IProviderStreamer
     {

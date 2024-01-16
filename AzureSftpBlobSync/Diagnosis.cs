@@ -1,6 +1,7 @@
 using System.Net;
 using AzureSftpBlobSync.JobConfigs;
-using AzureSftpBlobSync.Providers.AzureBlobProvider;
+using AzureSftpBlobSync.Providers.StorageProviders.AzureBlobProvider;
+using AzureSftpBlobSync.Providers.StorageProviders.SftpProvider;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;

@@ -1,4 +1,4 @@
-using AzureSftpBlobSync.Providers.AzureBlobProvider;
+using AzureSftpBlobSync.Providers.StorageProviders.AzureBlobProvider;
 using Microsoft.Extensions.Azure;
 
 namespace AzureSftpBlobSync.Tests

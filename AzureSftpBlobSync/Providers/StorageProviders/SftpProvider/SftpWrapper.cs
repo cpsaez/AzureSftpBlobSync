@@ -7,33 +7,34 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureSftpBlobSync
+namespace AzureSftpBlobSync.Providers.StorageProviders.SftpProvider
 {
-    public class SftpWrapper : IDisposable
+    public class SftpWrapper : IProviderStreamer, IDisposable
     {
         private SftpClient client;
 
-        public SftpWrapper(SftpAccountConfig config)
+        public SftpWrapper(Config config)
         {
-            this.client = BuildSftpClient(config);
+            client = BuildSftpClient(config);
         }
 
         public IEnumerable<string> Dir(string sftpFolder, bool sftpFolderRecursiveEnabled)
         {
-            this.Connect();
-            if (!this.client.Exists(sftpFolder))
+            Connect();
+            if (!client.Exists(sftpFolder))
             {
                 return Enumerable.Empty<string>();
             }
 
-            var listDirectory=this.client.ListDirectory(sftpFolder);
+            var listDirectory = client.ListDirectory(sftpFolder);
             if (listDirectory == null) return Array.Empty<string>();
             List<string> result = new List<string>();
-            foreach (var entry in listDirectory) { 
-                if (entry.IsDirectory && sftpFolderRecursiveEnabled && entry.Name!="." && entry.Name!="..")
+            foreach (var entry in listDirectory)
+            {
+                if (entry.IsDirectory && sftpFolderRecursiveEnabled && entry.Name != "." && entry.Name != "..")
                 {
                     result.AddRange(Dir(entry.FullName, true));
-                }   
+                }
                 else if (entry.IsRegularFile)
                 {
                     result.Add(entry.FullName);
@@ -45,48 +46,48 @@ namespace AzureSftpBlobSync
 
         public Stream OpenReadStream(string file)
         {
-            this.Connect();
-            var stream=this.client.OpenRead(file);
+            Connect();
+            var stream = client.OpenRead(file);
             return stream;
         }
 
         public void WriteStream(Stream reader, string destination)
         {
             Connect();
-            this.client.UploadFile(reader, destination);
+            client.UploadFile(reader, destination);
         }
 
         public void WriteBytes(byte[] bytes, string destination)
         {
             Connect();
-            this.client.WriteAllBytes(destination, bytes);
+            client.WriteAllBytes(destination, bytes);
         }
 
         public void DeleteFile(string file)
         {
-            this.Connect();
-            this.client.Delete(file);
+            Connect();
+            client.Delete(file);
         }
 
         public void Connect()
         {
-            if (!this.client.IsConnected) this.client.Connect();
+            if (!client.IsConnected) client.Connect();
         }
 
         public void Dispose()
         {
             try
             {
-                if (this.client!=null && this.client.IsConnected)
+                if (client != null && client.IsConnected)
                 {
-                    this.client.Disconnect();
-                    this.client.Dispose();
+                    client.Disconnect();
+                    client.Dispose();
                 }
             }
             catch { }
         }
 
-        private SftpClient BuildSftpClient(SftpAccountConfig sftpConfig)
+        private SftpClient BuildSftpClient(Config sftpConfig)
         {
             if (sftpConfig == null) { throw new ArgumentNullException(nameof(sftpConfig)); }
 
@@ -107,7 +108,5 @@ namespace AzureSftpBlobSync
             SftpClient client = new SftpClient(connectionInfo);
             return client;
         }
-
-
     }
 }

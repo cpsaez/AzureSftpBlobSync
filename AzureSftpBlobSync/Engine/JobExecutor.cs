@@ -1,6 +1,7 @@
 ﻿using AzureSftpBlobSync.JobConfigs;
 using AzureSftpBlobSync.JobConfigs.StorageAccounts;
-using AzureSftpBlobSync.Providers.AzureBlobProvider;
+using AzureSftpBlobSync.Providers.StorageProviders.AzureBlobProvider;
+using AzureSftpBlobSync.Providers.StorageProviders.SftpProvider;
 using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Logging;
 using Renci.SshNet;

@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using AzureSftpBlobSync.Providers;
 
-namespace AzureSftpBlobSync.JobConfigs.StorageAccounts
+namespace AzureSftpBlobSync.Providers.StorageProviders.SftpProvider
 {
-    public class SftpAccountConfig : StorageAccountConfigBase
+    public class Config : StorageAccountConfigBase
     {
-        public SftpAccountConfig():base()
+        public Config() : base()
         {
-            Name = string.Empty;
             Url = string.Empty;
             Port = 0;
             UserName = string.Empty;
@@ -30,12 +27,11 @@ namespace AzureSftpBlobSync.JobConfigs.StorageAccounts
         public string UserName { get; set; }
 
         public string Password { get; set; }
+        
+        public int PrivateKeyId { get; set; }
 
-        [JsonIgnore]
-        public string PrivateKey { get; set; }
 
-        public string PrivateKeyFileName { get; set; }
 
-        public string PrivateKeyPassPhrase { get; set; }
+        public override string StorageAccountType => Provider.SftpProvider;
     }
 }

@@ -19,7 +19,7 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<IJobsExecutor, JobsExecutor>();
-        services.AddSingleton<IConfigBuilder, ConfigBuilder>();
+        services.AddSingleton<IConfigReader, ConfigReader>();
     })
     .Build();
 

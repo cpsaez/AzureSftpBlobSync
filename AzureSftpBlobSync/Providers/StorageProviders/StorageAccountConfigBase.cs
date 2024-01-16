@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AzureSftpBlobSync.Providers
+namespace AzureSftpBlobSync.Providers.StorageProviders
 {
     public abstract class StorageAccountConfigBase
     {
@@ -18,4 +18,4 @@ namespace AzureSftpBlobSync.Providers
         public abstract string StorageAccountType { get; }
     }
 }
-}
+
