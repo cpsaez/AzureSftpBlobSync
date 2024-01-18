@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AzureSftpBlobSync.Engine;
 using AzureSftpBlobSync;
+using AzureSftpBlobSync.Providers.SshProvider;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -20,6 +21,7 @@ var host = new HostBuilder()
         services.ConfigureFunctionsApplicationInsights();
         services.AddSingleton<IJobsExecutor, JobsExecutor>();
         services.AddSingleton<IConfigReader, ConfigReader>();
+        services.AddSingleton<IKeysService, KeysService>();
     })
     .Build();
 

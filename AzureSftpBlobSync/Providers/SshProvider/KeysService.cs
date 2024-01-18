@@ -10,11 +10,17 @@ using System.Threading.Tasks;
 
 namespace AzureSftpBlobSync.Providers.SshProvider
 {
-    public class KeysService
+    public interface IKeysService
+    {
+        Task<IEnumerable<KeyConfig>> GetKeys();
+    }
+
+    public class KeysService : IKeysService
     {
         public const string SSHKEYSCONFIGPATH = "sshkeys.json";
         private IProviderStreamer configReader;
         private string configFolder;
+        private IEnumerable<KeyConfig>? keyConfigs = null;
 
         public KeysService(IConfigReader configReader)
         {
@@ -25,6 +31,8 @@ namespace AzureSftpBlobSync.Providers.SshProvider
 
         public async Task<IEnumerable<KeyConfig>> GetKeys()
         {
+            if (keyConfigs != null) return keyConfigs;
+
             var configPath = PathHelper.RemoveBeginSlash(PathHelper.PutEndSlash(this.configFolder) + SSHKEYSCONFIGPATH);
 
             if (!this.configReader.Exists(configPath)) { return Array.Empty<KeyConfig>(); }
@@ -65,7 +73,8 @@ namespace AzureSftpBlobSync.Providers.SshProvider
                 }
             }
 
-            return result.ToArray();
+            this.keyConfigs = result.ToArray();
+            return this.keyConfigs;
         }
     }
 }
