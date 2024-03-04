@@ -14,7 +14,11 @@ namespace AzureSftpBlobSync.Providers.SshProvider
             this.PrivateKeyFilePath = string.Empty;
             this.PrivateKey = string.Empty;
             this.PrivateKeyPassPhrase = string.Empty;
+            this.Name = string.Empty;
         }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
 
         public string PrivateKeyPassPhrase { get; set; }
         public string PrivateKeyFilePath { get; set; }
